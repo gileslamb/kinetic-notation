@@ -1,0 +1,169 @@
+/* ============================================
+   Kinetic Notation — Main Styles
+   Dark theme, full-screen canvas layout
+   ============================================ */
+
+/* CSS Custom Properties */
+:root {
+    /* Background & Canvas */
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-panel: rgba(14, 14, 22, 0.92);
+
+    /* Text */
+    --text-primary: #e8e8f0;
+    --text-secondary: #8888a0;
+    --text-muted: #555568;
+
+    /* Accent colors */
+    --accent-primary: #ff6b3d;
+    --accent-secondary: #ff9f6b;
+    --accent-glow: rgba(255, 107, 61, 0.3);
+
+    /* Preset: Ember (default) */
+    --trace-color-1: #ff6b3d;
+    --trace-color-2: #ff9f6b;
+    --trace-color-3: #ffd093;
+
+    /* UI */
+    --border-color: rgba(255, 255, 255, 0.06);
+    --border-active: rgba(255, 107, 61, 0.4);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+
+    /* Transitions */
+    --transition-fast: 120ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 500ms ease;
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base */
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Canvas — fills entire viewport */
+#kinetic-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    background-color: var(--bg-primary);
+    cursor: crosshair;
+}
+
+/* Status bar — top-left overlay */
+#status-bar {
+    position: fixed;
+    top: var(--space-md);
+    left: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
+    user-select: none;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+#status-text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+#status-text::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    transition: background-color var(--transition-normal);
+}
+
+body.listening #status-text::before {
+    background-color: var(--accent-primary);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+#fps-counter {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Typography */
+h2 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+h3 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+}
+
+/* Selection */
+::selection {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+/* Scrollbar (for potential future scrollable areas) */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}

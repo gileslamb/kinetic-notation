@@ -1,0 +1,114 @@
+/* ============================================
+   Kinetic Notation — Responsive Styles
+   Adaptations for mobile & tablet viewports
+   ============================================ */
+
+/* Tablet (landscape) */
+@media screen and (max-width: 1024px) {
+    #control-panel {
+        width: 260px;
+        bottom: var(--space-md);
+        right: var(--space-md);
+    }
+}
+
+/* Tablet (portrait) & large phones */
+@media screen and (max-width: 768px) {
+    #control-panel {
+        width: calc(100vw - var(--space-md) * 2);
+        max-width: 400px;
+        bottom: var(--space-md);
+        right: var(--space-md);
+        left: var(--space-md);
+        margin: 0 auto;
+    }
+
+    .panel-body {
+        max-height: 50vh;
+    }
+
+    #status-bar {
+        top: var(--space-sm);
+        left: var(--space-sm);
+        font-size: 11px;
+    }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+    :root {
+        --space-lg: 16px;
+        --space-md: 12px;
+    }
+
+    #control-panel {
+        bottom: var(--space-sm);
+        right: var(--space-sm);
+        left: var(--space-sm);
+        border-radius: var(--radius-md);
+    }
+
+    .panel-header {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .panel-body {
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+        gap: var(--space-md);
+        max-height: 45vh;
+    }
+
+    .button-row {
+        gap: var(--space-xs);
+    }
+
+    .btn {
+        padding: 6px var(--space-sm);
+        font-size: 11px;
+    }
+
+    h2 {
+        font-size: 12px;
+    }
+
+    h3 {
+        font-size: 10px;
+    }
+}
+
+/* Very tall / narrow screens — ensure panel doesn't overlap status */
+@media screen and (max-height: 500px) {
+    .panel-body {
+        max-height: 35vh;
+    }
+
+    #control-panel {
+        bottom: var(--space-sm);
+    }
+}
+
+/* Hover-capable devices only — avoid sticky hover on touch */
+@media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+        border-color: var(--border-active);
+        color: var(--text-primary);
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: rgba(255, 255, 255, 0.2);
+        --text-muted: #888;
+    }
+}

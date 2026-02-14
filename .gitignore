@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+bower_components/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Build output
+dist/
+build/
+*.min.js
+*.min.css
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Data files (large motion capture files)
+data/motion-capture/*.bvh
+data/motion-capture/*.fbx
+
+# Temporary files
+tmp/
+temp/
+*.tmp
