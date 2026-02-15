@@ -12,10 +12,11 @@
 const MODES = {
     jazz: {
         name: 'Jazz',
-        description: 'Cubist strokes — timeline scrolling L→R',
+        description: 'Cubist strokes — building left to right',
         renderer: 'discrete',
         canvasFade: 0.04,
-        canvasScroll: 0.8,         // px/frame — playhead + trail scroll speed
+        canvasScroll: 0.5,         // px/frame trail drift (subtle)
+        gestureStep: 50,           // px jump per gesture — ~38 gestures to fill 1920px
         visualMode: 'jazz',
     },
     organic: {
@@ -23,7 +24,8 @@ const MODES = {
         description: 'Meditative flowing arcs — gentle drift',
         renderer: 'discrete',
         canvasFade: 0.012,
-        canvasScroll: 0.3,         // slower playhead for contemplative pace
+        canvasScroll: 0.2,         // very gentle trail drift
+        gestureStep: 80,           // wider spacing — sparser, ~24 gestures to fill
         visualMode: 'organic',
     },
     flow: {

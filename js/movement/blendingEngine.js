@@ -35,18 +35,38 @@ function rotate(dx, dy, angle) {
 }
 
 // ── Timeline playhead ─────────────────────────────────
-// Advances left-to-right across the canvas.  New clips spawn at the head.
+// Steps right each time a gesture is created.
+// Each new clip appears to the right of the previous one.
 let _timelineX = 0;
+let _timelineStep = 0;   // px to advance per gesture (set by mode)
 
 /**
- * Set the current timeline playhead X position (CSS pixels).
- * Called by App each frame.
- * @param {number} x
+ * Configure the timeline.
+ * @param {number} step   px to advance per gesture creation
  */
-export function setTimelineX(x) { _timelineX = x; }
+export function configureTimeline(step) {
+    _timelineStep = step;
+}
+
+/** Reset playhead to the left edge. */
+export function resetTimeline() {
+    _timelineX = 0;
+}
 
 /** @returns {number} current playhead X */
-export function getTimelineX()  { return _timelineX; }
+export function getTimelineX() { return _timelineX; }
+
+/**
+ * Advance the playhead by one step. Called internally when a clip is created.
+ * Wraps back to 0 when past canvas width.
+ */
+function _advancePlayhead() {
+    const w = canvasManager.width || 1920;
+    _timelineX += _timelineStep;
+    if (_timelineX > w) {
+        _timelineX = 0;
+    }
+}
 
 // ─── Template Definitions ────────────────────────────
 
@@ -431,21 +451,21 @@ export function createGestureClip(features, phrase, uiParams) {
 
     const w = canvasManager.width;
     const h = canvasManager.height;
-    const maxR = Math.min(w, h) * 0.25;
 
-    // Timeline playhead: gestures spawn at the current head position
-    // with vertical spread and a small horizontal scatter around the head
-    const headX = _timelineX || w * 0.5;
-    const spreadX = maxR * 0.25;  // slight horizontal scatter around head
-    const spawnCY = h * 0.5;
-
-    const angle = Math.random() * Math.PI * 2;
-    const vertDist = Math.random() * maxR * 0.5;
+    // Place this gesture at the current playhead X, with vertical spread
+    const headX = _timelineX;
+    const vertSpread = h * 0.35;
+    const horzJitter = w * 0.03;  // tiny horizontal scatter so they don't stack
 
     const origin = {
-        x: headX + (Math.random() - 0.5) * spreadX,
-        y: spawnCY + Math.sin(angle) * vertDist,
+        x: headX + (Math.random() - 0.5) * horzJitter,
+        y: h * 0.5 + (Math.random() - 0.5) * vertSpread,
     };
+
+    // Step the playhead right for the NEXT gesture
+    if (_timelineStep > 0) {
+        _advancePlayhead();
+    }
 
     const heading = angle + (features.bass - features.treble) * 0.5 * Math.PI * 0.5;
     const scale = 0.5 + intensity * 1.0;
