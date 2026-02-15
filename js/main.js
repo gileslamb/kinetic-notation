@@ -670,6 +670,12 @@ class App {
             const fadeMax = (vm && vm.trailFadeRange) ? vm.trailFadeRange[1] : 0.12;
             const discreteFade = mapRange(this.params.trailFade, 0, 1, fadeMin, fadeMax);
 
+            // Horizontal scroll: shift canvas right so gestures drift L→R
+            const scrollPx = mode.canvasScroll || 0;
+            if (scrollPx > 0) {
+                canvasManager.scroll(scrollPx * (0.5 + this.params.speed));
+            }
+
             if (hasInput) {
                 const clips = this.clipQueue.getVisibleClips();
                 traceRenderer.render(clips, preset, { baseLineWeight, fadeRate: discreteFade });

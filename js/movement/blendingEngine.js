@@ -21,6 +21,7 @@
 
 import { GestureClip } from '../core/clipManager.js';
 import canvasManager from '../visualization/canvas.js';
+import modeManager from '../core/modeManager.js';
 import { createHybridPathFn, listImported, setUseVideoImports } from './naturalMotions.js';
 import { getActiveSource, getLibrarySummary } from './gestureLibrary.js';
 
@@ -414,15 +415,22 @@ export function createGestureClip(features, phrase, uiParams) {
         1.0
     );
 
-    const cx = canvasManager.center.x;
-    const cy = canvasManager.center.y;
-    const maxR = Math.min(canvasManager.width, canvasManager.height) * 0.3;
+    const w = canvasManager.width;
+    const h = canvasManager.height;
+    const maxR = Math.min(w, h) * 0.3;
+
+    // Spawn bias: when canvas scrolls, bias origins toward the left
+    // spawnBias = 0.35 means center of spawn zone is at 35% of canvas width
+    const spawnBias = modeManager.current.spawnBias || 0.5;
+    const spawnCX = w * spawnBias;
+    const spawnCY = h * 0.5;
+
     const angle = Math.random() * Math.PI * 2;
-    const dist = Math.random() * maxR * 0.6;
+    const dist = Math.random() * maxR * 0.5;
 
     const origin = {
-        x: cx + Math.cos(angle) * dist,
-        y: cy + Math.sin(angle) * dist,
+        x: spawnCX + Math.cos(angle) * dist,
+        y: spawnCY + Math.sin(angle) * dist,
     };
 
     const heading = angle + (features.bass - features.treble) * 0.5 * Math.PI * 0.5;

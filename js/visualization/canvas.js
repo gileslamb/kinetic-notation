@@ -94,6 +94,40 @@ class CanvasManager {
     }
 
     /**
+     * Scroll the entire canvas content horizontally.
+     * Shifts existing pixels rightward, leaving a faded strip on the left.
+     * Creates a sense of continuous motion — old gestures drift right and fade.
+     *
+     * @param {number} px - CSS pixels to shift per call (typically 0.5–3)
+     */
+    scroll(px) {
+        if (px <= 0) return;
+        const ctx = this.ctx;
+        const dpr = this.dpr;
+        const cw = this.canvas.width;   // actual pixel width
+        const ch = this.canvas.height;  // actual pixel height
+        const shift = Math.round(px * dpr);
+
+        // Work in raw pixel space
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Copy existing content shifted right
+        ctx.drawImage(this.canvas,
+            0, 0, cw - shift, ch,         // source: everything except the right strip
+            shift, 0, cw - shift, ch      // dest: shifted right by `shift` pixels
+        );
+
+        // Fill the exposed left strip with background
+        ctx.fillStyle = Config.canvas.backgroundColor;
+        ctx.fillRect(0, 0, shift + 1, ch);
+
+        // Restore the CSS-pixel transform
+        ctx.restore();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    /**
      * Get center point of the canvas.
      * @returns {{ x: number, y: number }}
      */

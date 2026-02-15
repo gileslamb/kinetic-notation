@@ -12,16 +12,20 @@
 const MODES = {
     jazz: {
         name: 'Jazz',
-        description: 'Cubist overlapping strokes',
+        description: 'Cubist overlapping strokes — scrolling canvas',
         renderer: 'discrete',
         canvasFade: 0.05,
-        visualMode: 'jazz',        // key into Config.visualModes for discrete renderer
+        canvasScroll: 1.2,         // px/frame rightward drift — gestures evolve L→R
+        spawnBias: 0.35,           // origin X biased toward left 35% of canvas
+        visualMode: 'jazz',
     },
     organic: {
         name: 'Organic',
         description: 'Meditative flowing arcs',
         renderer: 'discrete',
-        canvasFade: 0.015,        // slightly faster fade prevents visual pile-up
+        canvasFade: 0.015,
+        canvasScroll: 0.4,         // gentle drift for organic — slower than jazz
+        spawnBias: 0.4,            // slight left bias
         visualMode: 'organic',
     },
     flow: {
