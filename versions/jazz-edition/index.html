@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kinetic Notation — Audio-reactive visualization that translates music into organic movement patterns">
+    <title>Kinetic Notation</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/controls.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Main visualization canvas -->
+    <canvas id="kinetic-canvas"></canvas>
+
+    <!-- Status indicator -->
+    <div id="status-bar">
+        <span id="status-text">Ready</span>
+        <span id="fps-counter">0 fps</span>
+    </div>
+
+    <!-- Control Panel -->
+    <div id="control-panel">
+        <div class="panel-header">
+            <h2>Kinetic Notation</h2>
+            <button id="btn-toggle-panel" class="btn-icon" aria-label="Toggle panel">
+                <span class="chevron">&#x25BC;</span>
+            </button>
+        </div>
+
+        <div class="panel-body">
+            <!-- Transport Controls -->
+            <div class="control-group">
+                <h3>Transport</h3>
+                <div class="button-row">
+                    <button id="btn-start" class="btn btn-primary">Start</button>
+                    <button id="btn-pause" class="btn" disabled>Pause</button>
+                    <button id="btn-clear" class="btn">Clear</button>
+                </div>
+            </div>
+
+            <!-- Input Mode -->
+            <div class="control-group">
+                <h3>Input</h3>
+                <div class="button-row">
+                    <button id="btn-mic" class="btn btn-source active" title="Microphone input">Audio</button>
+                    <button id="btn-file" class="btn btn-source" title="Audio file input">File</button>
+                    <button id="btn-midi" class="btn btn-source" title="MIDI input (low latency)">MIDI</button>
+                    <button id="btn-mpe" class="btn btn-source" title="MPE per-note expression">MPE</button>
+                    <button id="btn-hybrid" class="btn btn-source" title="MIDI timing + audio spectral">Hybrid</button>
+                </div>
+                <input type="file" id="audio-file-input" accept="audio/*" hidden>
+
+                <!-- MIDI Device Selector -->
+                <div id="midi-section" style="margin-top: 8px;">
+                    <select id="midi-device-select" class="midi-select">
+                        <option value="">Select MIDI device…</option>
+                    </select>
+                    <span id="midi-status" class="midi-status-text"></span>
+                </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="control-group">
+                <h3>Parameters</h3>
+
+                <div class="slider-control">
+                    <label for="slider-sensitivity">
+                        Sensitivity
+                        <span class="slider-value" id="val-sensitivity">50</span>
+                    </label>
+                    <input type="range" id="slider-sensitivity" min="0" max="100" value="50">
+                </div>
+
+                <div class="slider-control">
+                    <label for="slider-speed">
+                        Speed
+                        <span class="slider-value" id="val-speed">50</span>
+                    </label>
+                    <input type="range" id="slider-speed" min="0" max="100" value="50">
+                </div>
+
+                <div class="slider-control">
+                    <label for="slider-trail-fade">
+                        Trail Fade
+                        <span class="slider-value" id="val-trail-fade">70</span>
+                    </label>
+                    <input type="range" id="slider-trail-fade" min="0" max="100" value="70">
+                </div>
+
+                <div class="slider-control">
+                    <label for="slider-line-weight">
+                        Line Weight
+                        <span class="slider-value" id="val-line-weight">30</span>
+                    </label>
+                    <input type="range" id="slider-line-weight" min="1" max="100" value="30">
+                </div>
+            </div>
+
+            <!-- Visual Presets -->
+            <div class="control-group">
+                <h3>Style</h3>
+                <div class="button-row preset-row">
+                    <button class="btn btn-preset active" data-preset="ember">Ember</button>
+                    <button class="btn btn-preset" data-preset="ocean">Ocean</button>
+                    <button class="btn btn-preset" data-preset="forest">Forest</button>
+                    <button class="btn btn-preset" data-preset="void">Void</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (ES6 modules) -->
+    <script type="module" src="js/utils/config.js"></script>
+    <script type="module" src="js/utils/helpers.js"></script>
+    <script type="module" src="js/core/clipManager.js"></script>
+    <script type="module" src="js/input/midiManager.js"></script>
+    <script type="module" src="js/audio/audioAnalyzer.js"></script>
+    <script type="module" src="js/audio/featureExtraction.js"></script>
+    <script type="module" src="js/audio/parameterMapping.js"></script>
+    <script type="module" src="js/movement/movementVocabulary.js"></script>
+    <script type="module" src="js/movement/naturalMotions.js"></script>
+    <script type="module" src="js/movement/bvhParser.js"></script>
+    <script type="module" src="js/movement/blendingEngine.js"></script>
+    <script type="module" src="js/visualization/canvas.js"></script>
+    <script type="module" src="js/visualization/traceRenderer.js"></script>
+    <script type="module" src="js/visualization/effects.js"></script>
+    <script type="module" src="js/main.js?v=8"></script>
+</body>
+</html>

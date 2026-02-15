@@ -41,14 +41,25 @@
                 </div>
             </div>
 
-            <!-- Audio Source -->
+            <!-- Input Mode -->
             <div class="control-group">
-                <h3>Audio Source</h3>
+                <h3>Input</h3>
                 <div class="button-row">
-                    <button id="btn-mic" class="btn btn-source active">Microphone</button>
-                    <button id="btn-file" class="btn btn-source">File</button>
+                    <button id="btn-mic" class="btn btn-source active" title="Microphone input">Audio</button>
+                    <button id="btn-file" class="btn btn-source" title="Audio file input">File</button>
+                    <button id="btn-midi" class="btn btn-source" title="MIDI input (low latency)">MIDI</button>
+                    <button id="btn-mpe" class="btn btn-source" title="MPE per-note expression">MPE</button>
+                    <button id="btn-hybrid" class="btn btn-source" title="MIDI timing + audio spectral">Hybrid</button>
                 </div>
                 <input type="file" id="audio-file-input" accept="audio/*" hidden>
+
+                <!-- MIDI Device Selector -->
+                <div id="midi-section" style="margin-top: 8px;">
+                    <select id="midi-device-select" class="midi-select">
+                        <option value="">Select MIDI device…</option>
+                    </select>
+                    <span id="midi-status" class="midi-status-text"></span>
+                </div>
             </div>
 
             <!-- Sliders -->
@@ -88,9 +99,33 @@
                 </div>
             </div>
 
-            <!-- Visual Presets -->
+            <!-- Visual Mode -->
             <div class="control-group">
-                <h3>Style</h3>
+                <h3>Mode</h3>
+                <div class="mode-selector">
+                    <button class="btn btn-mode" data-mode="jazz">
+                        <span class="mode-name">Jazz</span>
+                        <span class="mode-desc">Cubist overlapping strokes</span>
+                    </button>
+                    <button class="btn btn-mode" data-mode="organic">
+                        <span class="mode-name">Organic</span>
+                        <span class="mode-desc">Meditative flowing arcs</span>
+                    </button>
+                    <button class="btn btn-mode active" data-mode="flow">
+                        <span class="mode-name">Flow</span>
+                        <span class="mode-desc">Continuous seismograph line</span>
+                    </button>
+                    <button class="btn btn-mode" data-mode="minimal">
+                        <span class="mode-name">Minimal</span>
+                        <span class="mode-desc">Sparse continuous trace</span>
+                    </button>
+                </div>
+                <div id="mode-info" class="mode-info">Continuous seismograph line</div>
+            </div>
+
+            <!-- Color Presets -->
+            <div class="control-group">
+                <h3>Color</h3>
                 <div class="button-row preset-row">
                     <button class="btn btn-preset active" data-preset="ember">Ember</button>
                     <button class="btn btn-preset" data-preset="ocean">Ocean</button>
@@ -101,19 +136,165 @@
         </div>
     </div>
 
+    <!-- Motion Import Panel (left side) -->
+    <div id="motion-import-panel" class="motion-panel">
+        <button id="btn-toggle-motion" class="btn-icon motion-panel-toggle" aria-label="Toggle motion import">
+            <span class="motion-toggle-icon">&#x25B6;</span>
+            <span class="motion-toggle-label">Motion Import</span>
+        </button>
+
+        <div id="motion-panel-body" class="motion-panel-body">
+            <div class="motion-section">
+                <h3>Video Source</h3>
+                <button id="btn-motion-upload" class="btn btn-full">Upload Video</button>
+                <input type="file" id="motion-video-input" accept="video/*" hidden>
+                <div id="motion-stats-frames" class="motion-stats">No video loaded</div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Preview</h3>
+                <canvas id="motion-preview-canvas" class="motion-preview" width="320" height="180"></canvas>
+            </div>
+
+            <div class="motion-section">
+                <h3>Extract</h3>
+                <div class="button-row">
+                    <button id="btn-motion-extract" class="btn btn-primary btn-full">Extract Motion</button>
+                    <button id="btn-motion-abort" class="btn" disabled>Abort</button>
+                </div>
+                <div class="motion-progress">
+                    <div class="motion-progress-track">
+                        <div id="motion-progress-bar" class="motion-progress-fill"></div>
+                    </div>
+                    <span id="motion-progress-text" class="motion-progress-label">0 / 0</span>
+                </div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Intensity</h3>
+                <div id="motion-intensity-graph" class="intensity-graph"></div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Gesture</h3>
+                <div class="motion-field">
+                    <label for="motion-gesture-name">Name</label>
+                    <input type="text" id="motion-gesture-name" class="motion-input" placeholder="whale_breach" value="">
+                </div>
+                <div class="motion-field">
+                    <label for="motion-vocab-select">Vocabulary</label>
+                    <select id="motion-vocab-select" class="midi-select">
+                        <option value="whale">whale</option>
+                        <option value="wing">wing</option>
+                        <option value="leaf">leaf</option>
+                        <option value="spiral">spiral</option>
+                        <option value="surge">surge</option>
+                        <option value="scatter">scatter</option>
+                        <option value="cascade">cascade</option>
+                        <option value="ribbon">ribbon</option>
+                        <option value="bloom">bloom</option>
+                        <option value="pendulum">pendulum</option>
+                        <option value="crackle">crackle</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Save / Load</h3>
+                <div class="button-row">
+                    <button id="btn-motion-save" class="btn btn-full">Save JSON</button>
+                    <button id="btn-motion-load" class="btn btn-full">Load JSON</button>
+                </div>
+                <input type="file" id="motion-load-input" accept=".json" hidden>
+                <button id="btn-motion-import" class="btn btn-primary btn-full" style="margin-top: 8px;">Import to Vocabulary</button>
+            </div>
+
+            <hr class="motion-divider">
+
+            <!-- ── Override / Testing Controls ── -->
+            <div class="motion-section">
+                <h3>Gesture Source</h3>
+                <div class="override-toggle-row">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle-use-imported" checked>
+                        <span class="toggle-text">Use imported motion data</span>
+                    </label>
+                </div>
+                <div class="override-toggle-row" style="margin-top: 4px;">
+                    <span class="toggle-hint">Off = math/physics engine only</span>
+                </div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Selection Mode</h3>
+                <div class="override-mode-btns">
+                    <button class="btn btn-override-mode active" data-omode="auto">Auto</button>
+                    <button class="btn btn-override-mode" data-omode="forced">Forced</button>
+                    <button class="btn btn-override-mode" data-omode="imported">Imported Only</button>
+                </div>
+                <div id="forced-vocab-row" class="motion-field" style="margin-top: 8px; display: none;">
+                    <label for="forced-vocab-select">Force vocabulary</label>
+                    <select id="forced-vocab-select" class="midi-select">
+                        <option value="">— select —</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Randomize</h3>
+                <div class="override-toggle-row">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle-randomize">
+                        <span class="toggle-text">Equal-chance random across imports</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="motion-section">
+                <h3>Category Weights</h3>
+                <div id="weight-sliders-container" class="weight-sliders">
+                    <div class="weight-empty">No imports loaded yet</div>
+                </div>
+            </div>
+
+            <hr class="motion-divider">
+
+            <!-- Gesture Source Summary -->
+            <div class="motion-section">
+                <h3>Gesture Sources</h3>
+                <div class="source-legend">
+                    <span class="source-badge bio">bio</span> = biomechanical model
+                    <span class="source-badge video">video</span> = video import
+                </div>
+                <div id="gesture-source-summary" class="gesture-source-summary"></div>
+            </div>
+
+            <div id="motion-status" class="motion-status">Ready</div>
+        </div>
+    </div>
+
     <!-- Scripts (ES6 modules) -->
     <script type="module" src="js/utils/config.js"></script>
     <script type="module" src="js/utils/helpers.js"></script>
+    <script type="module" src="js/core/clipManager.js"></script>
+    <script type="module" src="js/core/modeManager.js"></script>
+    <script type="module" src="js/input/midiManager.js"></script>
     <script type="module" src="js/audio/audioAnalyzer.js"></script>
     <script type="module" src="js/audio/featureExtraction.js"></script>
     <script type="module" src="js/audio/parameterMapping.js"></script>
     <script type="module" src="js/movement/movementVocabulary.js"></script>
-    <script type="module" src="js/movement/naturalMotions.js"></script>
+    <script type="module" src="js/movement/biomechanicalModels.js"></script>
+    <script type="module" src="js/movement/gestureLibrary.js"></script>
+    <script type="module" src="js/movement/naturalMotions.js?v=5"></script>
     <script type="module" src="js/movement/bvhParser.js"></script>
-    <script type="module" src="js/movement/blendingEngine.js"></script>
+    <script type="module" src="js/utils/perlin.js"></script>
+    <script type="module" src="js/movement/physics.js"></script>
+    <script type="module" src="js/movement/blendingEngine.js?v=4"></script>
     <script type="module" src="js/visualization/canvas.js"></script>
     <script type="module" src="js/visualization/traceRenderer.js"></script>
+    <script type="module" src="js/visualization/continuousLine.js?v=4"></script>
     <script type="module" src="js/visualization/effects.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/tools/videoMotionExtractor.js?v=4"></script>
+    <script type="module" src="js/main.js?v=25"></script>
 </body>
 </html>

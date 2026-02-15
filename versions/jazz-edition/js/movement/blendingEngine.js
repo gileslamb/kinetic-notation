@@ -21,8 +21,6 @@
 
 import { GestureClip } from '../core/clipManager.js';
 import canvasManager from '../visualization/canvas.js';
-import { createHybridPathFn, listImported, setUseVideoImports } from './naturalMotions.js';
-import { getActiveSource, getLibrarySummary } from './gestureLibrary.js';
 
 // ─── Helper: rotate a point by angle ─────────────────
 
@@ -229,83 +227,9 @@ const TEMPLATES = {
 
 const TEMPLATE_NAMES = Object.keys(TEMPLATES);
 
-// ═══════════════════════════════════════════════════════
-//  VOCABULARY OVERRIDE SYSTEM
-//
-//  Modes:
-//    'auto'     — normal audio-feature-based selection (default)
-//    'forced'   — always use one specific vocabulary
-//    'imported' — only pick from vocabularies with imported data,
-//                 weighted by per-vocab sliders
-// ═══════════════════════════════════════════════════════
-
-const _override = {
-    mode: 'auto',               // 'auto' | 'forced' | 'imported'
-    forcedVocab: null,          // string — used when mode === 'forced'
-    useImportedData: true,      // toggle: true = imported paths, false = math engine
-    weights: {},                // { vocab: 0–100 } weighting for 'imported' mode
-    randomize: false,           // true = random pick among imported (ignores weights)
-};
-
-/**
- * Set the override mode.
- * @param {'auto'|'forced'|'imported'} mode
- */
-export function setOverrideMode(mode) {
-    _override.mode = mode;
-    console.log(`[Override] Mode → ${mode}`);
-}
-
-/**
- * Force a specific vocabulary for all clips.
- * @param {string} vocab
- */
-export function setForcedVocabulary(vocab) {
-    _override.forcedVocab = vocab;
-    _override.mode = 'forced';
-    console.log(`[Override] Forced → ${vocab}`);
-}
-
-/**
- * Toggle between imported motion data and math/physics engine.
- * When off, imported data is ignored even if loaded.
- * @param {boolean} useImported
- */
-export function setUseImportedData(useImported) {
-    _override.useImportedData = useImported;
-    // Propagate to naturalMotions so createHybridPathFn respects the toggle
-    setUseVideoImports(useImported);
-    console.log(`[Override] Use imported data → ${useImported}`);
-}
-
-/**
- * Set per-vocabulary weight (0–100) for the 'imported' random mode.
- * @param {string} vocab
- * @param {number} weight 0–100
- */
-export function setVocabWeight(vocab, weight) {
-    _override.weights[vocab] = weight;
-}
-
-/**
- * Enable/disable pure randomization across imported vocabs.
- * @param {boolean} on
- */
-export function setRandomize(on) {
-    _override.randomize = on;
-    console.log(`[Override] Randomize → ${on}`);
-}
-
-/**
- * Get current override state (for UI sync).
- */
-export function getOverrideState() {
-    return { ..._override };
-}
-
 // ─── Vocabulary Selection ────────────────────────────
 
-function _selectByAudioFeatures(features) {
+function selectVocabulary(features) {
     const { onset, bass, mid, treble, brightness, amplitude } = features;
 
     // Explosive
@@ -331,68 +255,6 @@ function _selectByAudioFeatures(features) {
     if (mid > 0.2) return 'leaf';
 
     return 'leaf';
-}
-
-/**
- * Pick from vocabularies that have imported gesture data,
- * using weights or equal randomization.
- */
-function _selectFromImported() {
-    const imported = listImportedVocabs();
-    if (imported.length === 0) return null;
-
-    if (_override.randomize || Object.keys(_override.weights).length === 0) {
-        // Equal-chance random
-        return imported[Math.floor(Math.random() * imported.length)];
-    }
-
-    // Weighted random: build cumulative weights
-    let totalWeight = 0;
-    const entries = [];
-    for (const vocab of imported) {
-        const w = _override.weights[vocab] ?? 50;  // default 50 if no slider set
-        if (w > 0) {
-            totalWeight += w;
-            entries.push({ vocab, cumulative: totalWeight });
-        }
-    }
-    if (totalWeight === 0 || entries.length === 0) {
-        return imported[Math.floor(Math.random() * imported.length)];
-    }
-
-    const r = Math.random() * totalWeight;
-    for (const e of entries) {
-        if (r <= e.cumulative) return e.vocab;
-    }
-    return entries[entries.length - 1].vocab;
-}
-
-/**
- * Get list of vocabularies that have imported data.
- * Reads from the naturalMotions store.
- */
-function listImportedVocabs() {
-    return listImported().map(g => g.vocabulary);
-}
-
-function selectVocabulary(features) {
-    switch (_override.mode) {
-        case 'forced':
-            if (_override.forcedVocab && TEMPLATES[_override.forcedVocab]) {
-                return _override.forcedVocab;
-            }
-            break;
-
-        case 'imported': {
-            const pick = _selectFromImported();
-            if (pick && TEMPLATES[pick]) return pick;
-            // Fall through to auto if no imports
-            break;
-        }
-    }
-
-    // Auto mode — normal audio-based selection
-    return _selectByAudioFeatures(features);
 }
 
 // ─── Audio Clip Factory ──────────────────────────────
@@ -428,12 +290,6 @@ export function createGestureClip(features, phrase, uiParams) {
     const heading = angle + (features.bass - features.treble) * 0.5 * Math.PI * 0.5;
     const scale = 0.5 + intensity * 1.0;
 
-    // DUAL GESTURE SYSTEM:
-    //   useImportedData ON  → createHybridPathFn routes: imported video → bio model → math fallback
-    //   useImportedData OFF → math template pathFn only (legacy mode)
-    // In both cases, createHybridPathFn handles priority internally.
-    const pathFn = createHybridPathFn(vocabName, template.pathFn);
-
     return new GestureClip({
         vocabularyType: vocabName,
         duration,
@@ -441,7 +297,7 @@ export function createGestureClip(features, phrase, uiParams) {
         origin,
         heading,
         scale,
-        pathFn,
+        pathFn: template.pathFn,
         easingName: template.easing,
         variation: Math.random(),
     });
@@ -484,9 +340,6 @@ export function createMidiClip(mpeNote, uiParams) {
     const heading = (pitchN - 0.5) * Math.PI * 0.8 + mpeNote.pitchBend * 0.5;
     const scale = 0.4 + intensity * 1.0;
 
-    // DUAL GESTURE SYSTEM: always use hybrid pathFn
-    const pathFn = createHybridPathFn(vocabName, template.pathFn);
-
     return new GestureClip({
         vocabularyType: vocabName,
         duration,
@@ -494,7 +347,7 @@ export function createMidiClip(mpeNote, uiParams) {
         origin,
         heading,
         scale,
-        pathFn,
+        pathFn: template.pathFn,
         easingName: template.easing,
         variation: Math.random(),
         midiNoteKey: `${mpeNote.channel}:${mpeNote.note}`,

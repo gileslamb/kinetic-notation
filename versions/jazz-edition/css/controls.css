@@ -1,0 +1,284 @@
+/* ============================================
+   Kinetic Notation — Control Panel Styles
+   Fixed panel with transport, sliders, presets
+   ============================================ */
+
+/* Panel container — fixed at bottom-right */
+#control-panel {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    width: 280px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 200;
+    overflow: hidden;
+    transition: transform var(--transition-normal),
+                opacity var(--transition-normal);
+}
+
+#control-panel.collapsed .panel-body {
+    display: none;
+}
+
+/* Panel header */
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    user-select: none;
+}
+
+.panel-header h2 {
+    color: var(--text-primary);
+}
+
+/* Panel body */
+.panel-body {
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Control groups */
+.control-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---- Buttons ---- */
+
+.btn {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    outline: none;
+    font-family: inherit;
+}
+
+.btn:hover {
+    border-color: var(--border-active);
+    color: var(--text-primary);
+    background: rgba(255, 107, 61, 0.06);
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+    color: #fff;
+}
+
+.btn-primary.active {
+    background: #cc4422;
+    border-color: #cc4422;
+}
+
+/* Icon button */
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    font-family: inherit;
+}
+
+.btn-icon:hover {
+    color: var(--text-primary);
+}
+
+.chevron {
+    font-size: 10px;
+    transition: transform var(--transition-normal);
+}
+
+#control-panel.collapsed .chevron {
+    transform: rotate(180deg);
+}
+
+/* Button rows */
+.button-row {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.button-row .btn {
+    flex: 1;
+}
+
+/* Source toggle buttons */
+.btn-source.active {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: rgba(255, 107, 61, 0.08);
+}
+
+/* Preset buttons */
+.preset-row {
+    flex-wrap: wrap;
+}
+
+.btn-preset {
+    flex: 1 1 calc(50% - var(--space-xs));
+    font-size: 11px;
+    padding: var(--space-xs) var(--space-sm);
+}
+
+.btn-preset.active {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: rgba(255, 107, 61, 0.08);
+}
+
+/* ---- Sliders ---- */
+
+.slider-control {
+    margin-bottom: var(--space-md);
+}
+
+.slider-control:last-child {
+    margin-bottom: 0;
+}
+
+.slider-control label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.slider-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    font-size: 11px;
+    min-width: 24px;
+    text-align: right;
+}
+
+/* Custom range slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    cursor: pointer;
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 0 0 1px rgba(255, 107, 61, 0.3);
+    transition: box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    cursor: pointer;
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 0 0 1px rgba(255, 107, 61, 0.3);
+}
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.4);
+}
+
+/* ---- MIDI section ---- */
+
+.midi-select {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--transition-fast);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.midi-select:hover {
+    border-color: var(--border-active);
+}
+
+.midi-select:focus {
+    border-color: var(--accent-primary);
+}
+
+.midi-status-text {
+    display: inline-block;
+    margin-top: var(--space-xs);
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Wrap input mode buttons on narrow panels */
+.button-row {
+    flex-wrap: wrap;
+}
+
+.button-row .btn-source {
+    font-size: 11px;
+    padding: var(--space-xs) var(--space-sm);
+    min-width: 0;
+}
