@@ -22,7 +22,7 @@ import { extractFeatures, detectPhrase } from './audio/featureExtraction.js';
 
 // ── Discrete renderer (Jazz, Organic) ──
 import { ClipQueue } from './core/clipManager.js';
-import { createGestureClip, createMidiClip } from './movement/blendingEngine.js';
+import { createGestureClip, createMidiClip, setTimelineX } from './movement/blendingEngine.js';
 import traceRenderer from './visualization/traceRenderer.js';
 
 // ── Continuous renderer (Flow, Minimal) ──
@@ -63,6 +63,10 @@ class App {
 
         // ── Continuous renderer state ──
         this.primaryLine = null;  // created in init() after canvas ready
+
+        // ── Timeline playhead (for discrete scroll modes) ──
+        this._timelineX = 0;
+        this._timelineSpeed = 0;  // px/sec, set by mode
 
         // ── UI params ──
         this.params = {
@@ -294,7 +298,9 @@ class App {
             }
         }
 
-        // Clear canvas on mode switch
+        // Reset timeline and clear canvas on mode switch
+        this._timelineX = 0;
+        setTimelineX(0);
         canvasManager.clear();
     }
 
@@ -385,8 +391,34 @@ class App {
         this.clipQueue.clear();
         if (this.primaryLine) this.primaryLine.reset();
         this.demoTrace = { points: [], time: 0 };
+        this._timelineX = 0;
+        setTimelineX(0);
         canvasManager.clear();
         if (!this.isRunning) this._drawIdleState();
+    }
+
+    /**
+     * Advance the timeline playhead left-to-right.
+     * Gestures spawn at the head; the canvas scroll creates trailing fade.
+     * When the head reaches the right edge, it wraps back to the left.
+     */
+    _advanceTimeline(dt) {
+        const mode = modeManager.current;
+        const scrollSpeed = mode.canvasScroll || 0;
+        if (scrollSpeed <= 0) return;
+
+        const w = canvasManager.width;
+        // Timeline moves at scroll speed × speed slider (px per second at 60fps)
+        const pxPerFrame = scrollSpeed * (0.5 + this.params.speed);
+        this._timelineX += pxPerFrame;
+
+        // When head passes the right edge, wrap back to left and clear canvas
+        if (this._timelineX > w + 40) {
+            this._timelineX = 0;
+            canvasManager.clear();
+        }
+
+        setTimelineX(this._timelineX);
     }
 
     async _handleFileSelect(e) {
@@ -530,6 +562,11 @@ class App {
                 audioAnalyzer.getTimeDomainData(),
                 audioAnalyzer.getSampleRate()
             );
+        }
+
+        // ── Advance timeline playhead for discrete scroll modes ──
+        if (modeManager.isDiscrete()) {
+            this._advanceTimeline(dt);
         }
 
         if (!hasInput) {

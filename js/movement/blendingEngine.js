@@ -34,6 +34,20 @@ function rotate(dx, dy, angle) {
     };
 }
 
+// ── Timeline playhead ─────────────────────────────────
+// Advances left-to-right across the canvas.  New clips spawn at the head.
+let _timelineX = 0;
+
+/**
+ * Set the current timeline playhead X position (CSS pixels).
+ * Called by App each frame.
+ * @param {number} x
+ */
+export function setTimelineX(x) { _timelineX = x; }
+
+/** @returns {number} current playhead X */
+export function getTimelineX()  { return _timelineX; }
+
 // ─── Template Definitions ────────────────────────────
 
 const TEMPLATES = {
@@ -417,20 +431,20 @@ export function createGestureClip(features, phrase, uiParams) {
 
     const w = canvasManager.width;
     const h = canvasManager.height;
-    const maxR = Math.min(w, h) * 0.3;
+    const maxR = Math.min(w, h) * 0.25;
 
-    // Spawn bias: when canvas scrolls, bias origins toward the left
-    // spawnBias = 0.35 means center of spawn zone is at 35% of canvas width
-    const spawnBias = modeManager.current.spawnBias || 0.5;
-    const spawnCX = w * spawnBias;
+    // Timeline playhead: gestures spawn at the current head position
+    // with vertical spread and a small horizontal scatter around the head
+    const headX = _timelineX || w * 0.5;
+    const spreadX = maxR * 0.25;  // slight horizontal scatter around head
     const spawnCY = h * 0.5;
 
     const angle = Math.random() * Math.PI * 2;
-    const dist = Math.random() * maxR * 0.5;
+    const vertDist = Math.random() * maxR * 0.5;
 
     const origin = {
-        x: spawnCX + Math.cos(angle) * dist,
-        y: spawnCY + Math.sin(angle) * dist,
+        x: headX + (Math.random() - 0.5) * spreadX,
+        y: spawnCY + Math.sin(angle) * vertDist,
     };
 
     const heading = angle + (features.bass - features.treble) * 0.5 * Math.PI * 0.5;
